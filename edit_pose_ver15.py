@@ -546,7 +546,7 @@ def check_visibility(scene, camera, target_world_location):
     
     # ray_cast(起点, 方向, 距離)
     # ターゲットまでの距離を計算して、それ以上の遠くの壁に当たらないようにする
-    hit, loc, norm, index, obj, matrix = scene.ray_cast(depsgraph, cam_location, direction, distance=direction.length - 0.01)
+    hit, loc, norm, index, obj, matrix = scene.ray_cast(depsgraph, cam_location, direction, distance=direction.length - 0.1)
 
     # hitがTrueなら、ターゲットの手前で何かのメッシュに当たった＝隠れている
     return 0 if hit else 1
