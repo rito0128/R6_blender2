@@ -96,7 +96,7 @@ CAMERA_NAMES = ["Camera1"]
 OUTPUT_DIR = "C:/Users/a24k0/R6_blender2/scripts/img/" # "//" はBlenderファイルからの相対パスを意味します。
 
 # NPZ_FILEPATH = "C:/Users/a24k0/R6_blender2/scripts/keypoints.npz" 
-TAGET_DIR = './m1_npz'
+TAGET_DIR = './test_npz'
 EXTENSION = 'npz'
 
 # アノテーションデータの書き出し先ファイル
@@ -146,9 +146,9 @@ def render_from_multiple_cameras(ARMATURE_NAME, image_number):
             keypoint_3d = get_keypoint3d(scene, camera, ARMATURE_NAME)
             arrange_keypoint(keypoint_3d, OUTPUT_3d, 'S')
 
-            print("keypoint_2d")
+            #print("keypoint_2d")
             #print(keypoint_2d)
-            print("keypoint_3d")
+            #print("keypoint_3d")
             #print(keypoint_3d)
             
             # **出力ファイル名をカメラごとに設定**
@@ -315,17 +315,20 @@ def apply_pose_fk_method(armature, keypoints_list):
     view_layer.objects.active = armature
     bpy.ops.object.mode_set(mode='POSE') 
     
+    
     #ポーズボーンの初期化
     for pbone in armature.pose.bones:
         pbone.rotation_mode = 'QUATERNION'
-        pbone.rotation_quaternion = (1.0, 0.0, 0.0, 0.0)
-        pbone.location = (0.0, 0.0, 0.0)
+        
+    print("デバック　ボーンの初期化")
 
     # ボーン階層をソート (get_bone_hierarchy関数は省略 - 以前のコードにあるものを使用)
     def get_bone_hierarchy(bone, hierarchy_list):
         hierarchy_list.append(bone.name) 
         for child in bone.children: get_bone_hierarchy(child, hierarchy_list)
         return hierarchy_list
+    
+    print("デバック　ボーン階層のソート")
     
     sorted_bones = []
     armature_data = armature.data
@@ -357,6 +360,8 @@ def apply_pose_fk_method(armature, keypoints_list):
 
             # 回転を適用
             pbone.rotation_quaternion = target_rotation
+            
+    print("デバック　ポーズの適用が完了")
         
 
     bpy.ops.object.mode_set(mode='OBJECT') 
@@ -422,7 +427,7 @@ def apply_clear_pose_fk_method(armature):
     
     
 # ====================================================================
-# ボーンの向きを同じ方向にそろえる
+# ボーンの向きを同じ方向にそろえるための計算
 # ====================================================================
 def calculate_clear_rotation(armature_name='Armature'):
     #print("🔄 ポーズ計算開始（行列ベース）")
@@ -613,10 +618,10 @@ def generate_anotation_from_frame(npz_filepath, image_number):
     print("========================================================================")
     run_pose_application(npz_filepath)
     
-    print("========================================================================")
-    print("=============================レンダリング、アノテーションデータの作成=============================")
-    print("========================================================================")
-    render_from_multiple_cameras(ARMATURE_NAME, image_number)
+    # print("========================================================================")
+    # print("=============================レンダリング、アノテーションデータの作成=============================")
+    # print("========================================================================")
+    # render_from_multiple_cameras(ARMATURE_NAME, image_number)
     
 # ====================================================================
 # 連想配列を2次元配列に変換
@@ -638,24 +643,6 @@ def arrange_keypoint(keypoint_data, output_filepath, numpy_key):
     print(two_d_array)
     print("\n形状 (行数, 列数):", two_d_array.shape)
 
-# ====================================================================
-# numpyファイルに書き出す
-# ====================================================================
-# def generate_npz_file(output_filepath, keypoint, key):
-#     if os.path.exists(output_filepath):
-#         # 1. 既存データの読み込み
-#         with np.load(output_filepath, allow_pickle=True) as data:
-#             # 既存の配列を取り出す
-#             combined_data = data[key]
-        
-#         # 2. 垂直方向に結合 (既存のNフレーム + 新しい1フレーム)
-#         combined_data = np.concatenate([combined_data, keypoint], axis=0)
-#     else:
-#         # 新規作成
-#         combined_data = keypoint
-#         print(f"新規ファイルとして作成を開始します: {output_filepath}")
-
-#     np.savez_compressed(output_filepath, **{key: combined_data})
 def generate_npz_file(output_filepath, keypoint, key):
     # keypoint の形状が (17, 4) の場合、(1, 17, 4) に変換して「1フレーム分」として扱う
     if keypoint.ndim == 2:
