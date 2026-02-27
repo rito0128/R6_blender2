@@ -520,7 +520,6 @@ def calculate_rotation_from_npz (keypoints_list):
                 # 子ボーンの方向ベクトルを計算
                 #print("子ボーン : " + str(pair) + ", " + str(PAIR_LIST[pair]))
                 target_vec = keypoints_list[pair] - keypoints_list[PAIR_LIST[pair]]
-               
             
                 # 親ボーンから子ボーンへの回転を計算
                 rotation_result = parent_vec.normalized().rotation_difference(target_vec.normalized())
